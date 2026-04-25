@@ -31,9 +31,17 @@
         .actions { display: flex; gap: 5px; }
         .edit-mode { border-left: 4px solid #2196F3; }
         .search-info { background: #FFF3E0; padding: 10px 15px; border-radius: 4px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        nav { background: #333; padding: 10px 20px; border-radius: 8px; margin-bottom: 30px; }
+        nav a { color: white; text-decoration: none; margin-right: 20px; font-size: 16px; }
+        nav a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
+<nav>
+    <a href="students">Students</a>
+    <a href="courses">Courses</a>
+    <a href="enrollments">Enrollments</a>
+</nav>
 <h1>Student Management System</h1>
 
 <!-- Add/Edit Form -->
