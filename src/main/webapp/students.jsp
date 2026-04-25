@@ -38,6 +38,7 @@
 </head>
 <body>
 <nav>
+    <a href="dashboard">Dashboard</a>
     <a href="students">Students</a>
     <a href="courses">Courses</a>
     <a href="enrollments">Enrollments</a>

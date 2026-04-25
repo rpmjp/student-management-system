@@ -1,3 +1,3 @@
 <%
-    response.sendRedirect("students");
+    response.sendRedirect("dashboard");
 %>
