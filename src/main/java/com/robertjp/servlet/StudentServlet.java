@@ -1,5 +1,8 @@
 package com.robertjp.servlet;
 
+import com.robertjp.util.MLClient;
+import com.robertjp.dao.EnrollmentDAO;
+
 import com.robertjp.dao.StudentDAO;
 import com.robertjp.model.Student;
 
@@ -32,6 +35,42 @@ public class StudentServlet extends HttpServlet {
         if (action == null) action = "list";
 
         switch (action) {
+            case "predict":
+                int predictId = Integer.parseInt(request.getParameter("id"));
+                Student predictStudent = studentDAO.getStudentById(predictId);
+                EnrollmentDAO enrollDAO = new EnrollmentDAO();
+
+                // Gather student data for prediction
+                var enrollments = enrollDAO.getEnrollmentsByStudent(predictId);
+                int coursesTaken = enrollments.size();
+                int coursesFailed = 0;
+                double totalGradePoints = 0;
+                int gradedCount = 0;
+                int totalCredits = 0;
+
+                for (var e : enrollments) {
+                    totalCredits += e.getCredits();
+                    if (e.getGradePoints() != null) {
+                        totalGradePoints += e.getGradePoints().doubleValue();
+                        gradedCount++;
+                        if (e.getGradePoints().doubleValue() < 1.0) coursesFailed++;
+                    }
+                }
+
+                double avgGradePoints = gradedCount > 0 ? totalGradePoints / gradedCount : 0;
+                double gpa = predictStudent.getGpa() != null ? predictStudent.getGpa().doubleValue() : avgGradePoints;
+                int semesters = (int) enrollments.stream().map(e -> e.getSemester()).distinct().count();
+                if (semesters == 0) semesters = 1;
+
+                String prediction = MLClient.getPrediction(gpa, coursesTaken, coursesFailed,
+                        avgGradePoints, totalCredits, semesters);
+
+                request.setAttribute("prediction", prediction);
+                request.setAttribute("predictStudent", predictStudent);
+                request.setAttribute("students", studentDAO.getAllStudents());
+                request.getRequestDispatcher("/students.jsp").forward(request, response);
+                break;
+
             case "edit":
                 int editId = Integer.parseInt(request.getParameter("id"));
                 Student editStudent = studentDAO.getStudentById(editId);

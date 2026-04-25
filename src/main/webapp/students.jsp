@@ -34,6 +34,11 @@
         nav { background: #333; padding: 10px 20px; border-radius: 8px; margin-bottom: 30px; }
         nav a { color: white; text-decoration: none; margin-right: 20px; font-size: 16px; }
         nav a:hover { text-decoration: underline; }
+        .btn-predict { background: #9C27B0; color: white; padding: 6px 12px; }
+        .btn-predict:hover { background: #7B1FA2; }
+        .prediction-card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid #9C27B0; }
+        .risk-high { color: #f44336; font-weight: bold; font-size: 18px; }
+        .risk-low { color: #4CAF50; font-weight: bold; font-size: 18px; }
     </style>
 </head>
 <body>
@@ -44,6 +49,28 @@
     <a href="enrollments">Enrollments</a>
 </nav>
 <h1>Student Management System</h1>
+
+<c:if test="${not empty prediction}">
+    <div class="prediction-card">
+        <h2>ML Risk Assessment: ${predictStudent.firstName} ${predictStudent.lastName}</h2>
+        <div id="predictionResult"></div>
+    </div>
+    <script>
+        var pred = JSON.parse('${prediction}');
+        var html = '';
+        if (pred.error) {
+            html = '<p>Error: ' + pred.error + '</p>';
+        } else {
+            var riskClass = pred.at_risk ? 'risk-high' : 'risk-low';
+            var riskText = pred.at_risk ? 'AT RISK' : 'NOT AT RISK';
+            html = '<p class="' + riskClass + '">' + riskText + '</p>';
+            html += '<p><strong>Confidence:</strong> ' + pred.confidence + '%</p>';
+            html += '<p><strong>Risk Probability:</strong> ' + pred.risk_probability + '%</p>';
+            html += '<p><strong>Recommendation:</strong> ' + pred.recommendation + '</p>';
+        }
+        document.getElementById('predictionResult').innerHTML = html;
+    </script>
+</c:if>
 
 <!-- Add/Edit Form -->
 <div class="form-container ${not empty editStudent ? 'edit-mode' : ''}">
@@ -119,6 +146,7 @@
             <td>${student.gpa}</td>
             <td>${student.enrollmentDate}</td>
             <td class="actions">
+                <a href="students?action=predict&id=${student.id}" class="btn btn-predict">Risk Check</a>
                 <a href="students?action=edit&id=${student.id}" class="btn btn-edit">Edit</a>
                 <a href="students?action=delete&id=${student.id}" class="btn btn-delete"
                    onclick="return confirm('Are you sure you want to delete this student?');">Delete</a>
