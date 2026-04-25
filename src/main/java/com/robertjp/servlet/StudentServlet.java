@@ -24,20 +24,49 @@ public class StudentServlet extends HttpServlet {
         studentDAO = new StudentDAO();
     }
 
-    // Handles GET requests - shows the list of students
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        List<Student> students = studentDAO.getAllStudents();
-        request.setAttribute("students", students);
-        request.getRequestDispatcher("/students.jsp").forward(request, response);
+        String action = request.getParameter("action");
+        if (action == null) action = "list";
+
+        switch (action) {
+            case "edit":
+                int editId = Integer.parseInt(request.getParameter("id"));
+                Student editStudent = studentDAO.getStudentById(editId);
+                request.setAttribute("editStudent", editStudent);
+                request.setAttribute("students", studentDAO.getAllStudents());
+                request.getRequestDispatcher("/students.jsp").forward(request, response);
+                break;
+
+            case "delete":
+                int deleteId = Integer.parseInt(request.getParameter("id"));
+                studentDAO.deleteStudent(deleteId);
+                response.sendRedirect("students");
+                break;
+
+            case "search":
+                String keyword = request.getParameter("keyword");
+                List<Student> results = studentDAO.searchStudents(keyword);
+                request.setAttribute("students", results);
+                request.setAttribute("searchKeyword", keyword);
+                request.getRequestDispatcher("/students.jsp").forward(request, response);
+                break;
+
+            default:
+                List<Student> students = studentDAO.getAllStudents();
+                request.setAttribute("students", students);
+                request.getRequestDispatcher("/students.jsp").forward(request, response);
+                break;
+        }
     }
 
-    // Handles POST requests - adds a new student
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        String action = request.getParameter("action");
 
         String firstName = request.getParameter("firstName");
         String lastName = request.getParameter("lastName");
@@ -46,8 +75,15 @@ public class StudentServlet extends HttpServlet {
         BigDecimal gpa = new BigDecimal(request.getParameter("gpa"));
         LocalDate enrollmentDate = LocalDate.parse(request.getParameter("enrollmentDate"));
 
-        Student student = new Student(firstName, lastName, email, major, gpa, enrollmentDate);
-        studentDAO.addStudent(student);
+        if ("update".equals(action)) {
+            int id = Integer.parseInt(request.getParameter("id"));
+            Student student = new Student(firstName, lastName, email, major, gpa, enrollmentDate);
+            student.setId(id);
+            studentDAO.updateStudent(student);
+        } else {
+            Student student = new Student(firstName, lastName, email, major, gpa, enrollmentDate);
+            studentDAO.addStudent(student);
+        }
 
         response.sendRedirect("students");
     }
