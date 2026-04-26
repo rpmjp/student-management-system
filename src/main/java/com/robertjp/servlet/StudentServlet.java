@@ -122,12 +122,60 @@ public class StudentServlet extends HttpServlet {
 
         String action = request.getParameter("action");
 
-        String firstName = request.getParameter("firstName");
-        String lastName = request.getParameter("lastName");
-        String email = request.getParameter("email");
-        String major = request.getParameter("major");
-        BigDecimal gpa = new BigDecimal(request.getParameter("gpa"));
-        LocalDate enrollmentDate = LocalDate.parse(request.getParameter("enrollmentDate"));
+        String firstName = request.getParameter("firstName").trim();
+        String lastName = request.getParameter("lastName").trim();
+        String email = request.getParameter("email").trim();
+        String major = request.getParameter("major").trim();
+        String gpaStr = request.getParameter("gpa");
+        String enrollmentDateStr = request.getParameter("enrollmentDate");
+
+        // Validation
+        StringBuilder errors = new StringBuilder();
+
+        if (firstName.isEmpty() || firstName.length() > 50) {
+            errors.append("First name is required and must be under 50 characters. ");
+        }
+        if (lastName.isEmpty() || lastName.length() > 50) {
+            errors.append("Last name is required and must be under 50 characters. ");
+        }
+        if (email.isEmpty() || !email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+            errors.append("Valid email is required. ");
+        }
+        if (major.length() > 100) {
+            errors.append("Major must be under 100 characters. ");
+        }
+
+        BigDecimal gpa;
+        try {
+            gpa = new BigDecimal(gpaStr);
+            if (gpa.compareTo(BigDecimal.ZERO) < 0 || gpa.compareTo(new BigDecimal("4.00")) > 0) {
+                errors.append("GPA must be between 0.00 and 4.00. ");
+            }
+        } catch (NumberFormatException e) {
+            errors.append("Invalid GPA format. ");
+            gpa = BigDecimal.ZERO;
+        }
+
+        LocalDate enrollmentDate;
+        try {
+            enrollmentDate = LocalDate.parse(enrollmentDateStr);
+        } catch (Exception e) {
+            errors.append("Invalid enrollment date. ");
+            enrollmentDate = LocalDate.now();
+        }
+
+        // Sanitize inputs - prevent XSS
+        firstName = sanitize(firstName);
+        lastName = sanitize(lastName);
+        email = sanitize(email);
+        major = sanitize(major);
+
+        if (errors.length() > 0) {
+            request.setAttribute("error", errors.toString());
+            request.setAttribute("students", studentDAO.getAllStudents());
+            request.getRequestDispatcher("/students.jsp").forward(request, response);
+            return;
+        }
 
         if ("update".equals(action)) {
             int id = Integer.parseInt(request.getParameter("id"));
@@ -135,24 +183,27 @@ public class StudentServlet extends HttpServlet {
             student.setId(id);
             studentDAO.updateStudent(student);
         } else {
-            // Generate student ID and create user account
             UserDAO userDAO = new UserDAO();
             String studentId = userDAO.generateStudentId(firstName, lastName);
             String defaultPassword = "Student123!";
 
-            // Create user account
             int userId = userDAO.createUser(studentId, defaultPassword, "STUDENT");
 
-            // Create student with linked user account
             Student student = new Student(firstName, lastName, email, major, gpa, enrollmentDate);
             student.setUserId(userId);
             student.setStudentId(studentId);
             studentDAO.addStudent(student);
-
-            System.out.println("NEW STUDENT: " + firstName + " " + lastName +
-                    " | ID: " + studentId + " | Default password: " + defaultPassword);
         }
 
         response.sendRedirect(request.getContextPath() + "/students");
+    }
+
+    private String sanitize(String input) {
+        if (input == null) return "";
+        return input.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#x27;");
     }
 }

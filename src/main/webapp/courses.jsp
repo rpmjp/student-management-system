@@ -95,6 +95,12 @@
 <div class="container">
   <h1>Course Management</h1>
 
+  <c:if test="${not empty error}">
+    <div class="card" style="border-left: 5px solid #f44336; margin-bottom: 20px;">
+      <p style="color: #C62828; font-weight: 500;">${error}</p>
+    </div>
+  </c:if>
+
   <div class="card">
     <h2>Add New Course</h2>
     <form action="courses" method="post">

@@ -167,6 +167,12 @@
         </div>
     </c:if>
 
+    <c:if test="${not empty error}">
+        <div class="card" style="border-left: 5px solid #f44336; margin-bottom: 20px;">
+            <p style="color: #C62828; font-weight: 500;">${error}</p>
+        </div>
+    </c:if>
+
     <!-- Add/Edit Form -->
     <div class="card ${not empty editStudent ? 'edit-mode' : ''}">
         <h2>${not empty editStudent ? 'Edit Student' : 'Add New Student'}</h2>
