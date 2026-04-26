@@ -5,49 +5,62 @@
 <head>
   <title>Login - Student Management System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/theme.css">
+  <script src="${pageContext.request.contextPath}/css/theme.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #1a1a2e; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-
+    body { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
     .login-container { width: 100%; max-width: 420px; padding: 20px; }
-    .login-card { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-
+    .login-card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+    }
     .login-header { text-align: center; margin-bottom: 32px; }
     .login-logo { font-size: 48px; margin-bottom: 8px; }
-    .login-title { font-size: 24px; font-weight: bold; color: #1a1a2e; margin-bottom: 4px; }
-    .login-subtitle { color: #888; font-size: 14px; }
-
+    .login-title { font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .login-subtitle { color: var(--text-muted); font-size: 14px; }
     .form-group { margin-bottom: 20px; }
-    .form-group label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .form-group input { width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px; transition: border 0.2s; }
-    .form-group input:focus { outline: none; border-color: #e94560; }
-    .form-group input::placeholder { color: #bbb; }
-
-    .btn-login { width: 100%; padding: 14px; background: #e94560; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-    .btn-login:hover { background: #c81e45; }
-
-    .error-message { background: #FFEBEE; color: #C62828; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; text-align: center; }
-
-    .login-footer { text-align: center; margin-top: 24px; color: #999; font-size: 13px; }
-    .login-footer a { color: #e94560; text-decoration: none; }
-
-    .role-hint { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-    .role-badge { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
-    .role-staff { background: #E3F2FD; color: #1565C0; }
-    .role-student { background: #E8F5E9; color: #2E7D32; }
-
+    .form-group label {
+      display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary);
+      margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .form-group input {
+      width: 100%; padding: 14px; border: 2px solid var(--border); border-radius: 12px;
+      font-size: 16px; background: var(--bg-card); color: var(--text-primary); transition: border 0.2s, box-shadow 0.2s;
+    }
+    .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(45, 212, 168, 0.15); }
+    .form-group input::placeholder { color: var(--text-muted); }
+    .btn-login {
+      width: 100%; padding: 14px; background: var(--primary); color: var(--primary-text);
+      border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
+      cursor: pointer; transition: background 0.2s, transform 0.2s;
+    }
+    .btn-login:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .login-error {
+      background: rgba(244, 67, 54, 0.1); color: var(--danger); padding: 12px 16px;
+      border-radius: 10px; margin-bottom: 20px; font-size: 14px; text-align: center;
+      border: 1px solid rgba(244, 67, 54, 0.2);
+    }
+    .login-footer { text-align: center; margin-top: 24px; color: var(--text-muted); font-size: 13px; line-height: 1.8; }
+    .login-theme-toggle {
+      position: fixed; top: 20px; right: 20px; background: none; border: 1px solid var(--border);
+      color: var(--text-muted); padding: 8px 12px; border-radius: 8px; cursor: pointer;
+      font-size: 16px; transition: all 0.2s;
+    }
+    .login-theme-toggle:hover { border-color: var(--primary); color: var(--primary); }
     @media (max-width: 600px) {
       .login-container { padding: 16px; }
-      .login-card { padding: 28px 24px; }
+      .login-card { padding: 28px 24px; border-radius: 16px; }
       .login-logo { font-size: 40px; }
       .login-title { font-size: 20px; }
     }
-
-    .btn-settings { color: #ccc; text-decoration: none; padding: 6px 14px; border-radius: 6px; font-size: 13px; transition: all 0.2s; }
-    .btn-settings:hover { background: #16213e; color: #e94560; }
   </style>
 </head>
 <body>
+<button class="login-theme-toggle" id="themeToggle"></button>
+
 <div class="login-container">
   <div class="login-card">
     <div class="login-header">
@@ -57,10 +70,10 @@
     </div>
 
     <c:if test="${not empty error}">
-      <div class="error-message">${error}</div>
+      <div class="login-error">${error}</div>
     </c:if>
 
-    <form action="login" method="post">
+    <form action="${pageContext.request.contextPath}/login" method="post">
       <div class="form-group">
         <label>Username / Student ID</label>
         <input type="text" name="username" placeholder="e.g. jd001 or admin" required autofocus>
@@ -74,7 +87,6 @@
 
     <div class="login-footer">
       Forgot your password? Contact your administrator to reset it.
-      <br><span style="font-size: 11px; color: #bbb;">Default password after reset: Student123!</span>
     </div>
   </div>
 </div>

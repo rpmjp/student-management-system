@@ -5,51 +5,22 @@
 <head>
   <title>Change Password - Student Management System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/theme.css">
+  <script src="${pageContext.request.contextPath}/css/theme.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #333; }
-
-    nav { background: #1a1a2e; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-    .nav-brand { color: #e94560; font-size: 20px; font-weight: bold; text-decoration: none; }
-    .nav-links { display: flex; gap: 5px; flex-wrap: wrap; }
-    .nav-links a { color: #ccc; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; transition: all 0.2s; }
-    .nav-links a:hover, .nav-links a.active { background: #16213e; color: #e94560; }
-    .nav-user { display: flex; align-items: center; gap: 12px; }
-    .nav-username { color: #e94560; font-weight: 600; font-size: 14px; }
-    .btn-logout { color: #ccc; text-decoration: none; padding: 6px 14px; border: 1px solid #444; border-radius: 6px; font-size: 13px; transition: all 0.2s; }
-    .btn-logout:hover { background: #e94560; color: white; border-color: #e94560; }
-
-    .container { max-width: 500px; margin: 40px auto; padding: 20px; }
-    .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    .card h2 { font-size: 22px; margin-bottom: 24px; color: #1a1a2e; }
-
+    .pw-container { max-width: 500px; margin: 40px auto; }
     .form-group { margin-bottom: 20px; }
-    .form-group label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .form-group input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; transition: border 0.2s; }
-    .form-group input:focus { outline: none; border-color: #e94560; }
-
-    .btn-primary { width: 100%; padding: 12px; background: #e94560; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-    .btn-primary:hover { background: #c81e45; }
-
-    .btn-back { display: inline-block; margin-top: 16px; color: #e94560; text-decoration: none; font-size: 14px; }
-
-    .error-message { background: #FFEBEE; color: #C62828; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; }
-    .success-message { background: #E8F5E9; color: #2E7D32; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; }
-
-    .password-rules { font-size: 12px; color: #888; margin-top: 8px; line-height: 1.6; }
-
-    @media (max-width: 600px) {
-      nav { padding: 12px 16px; }
-      .nav-brand { font-size: 18px; width: 100%; margin-bottom: 8px; }
-      .nav-links { width: 100%; }
-      .nav-links a { padding: 6px 12px; font-size: 13px; }
-      .nav-user { width: 100%; justify-content: space-between; margin-top: 8px; }
-      .container { padding: 12px; margin-top: 20px; }
-      .card { padding: 20px; }
-
-      .btn-settings { color: #ccc; text-decoration: none; padding: 6px 14px; border-radius: 6px; font-size: 13px; transition: all 0.2s; }
-      .btn-settings:hover { background: #16213e; color: #e94560; }
+    .form-group label {
+      display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary);
+      margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;
     }
+    .form-group input {
+      width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px;
+      font-size: 14px; background: var(--bg-card); color: var(--text-primary); transition: border 0.2s;
+    }
+    .form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(45, 212, 168, 0.15); }
+    .password-rules { font-size: 12px; color: var(--text-muted); margin-top: 8px; line-height: 1.6; }
+    .btn-back { display: inline-block; margin-top: 16px; color: var(--primary); text-decoration: none; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -72,19 +43,20 @@
   </div>
   <div class="nav-user">
     <span class="nav-username">${sessionScope.displayName}</span>
+    <button id="themeToggle" class="theme-toggle"></button>
     <a href="${pageContext.request.contextPath}/login?action=logout" class="btn-logout">Logout</a>
   </div>
 </nav>
 
-<div class="container">
+<div class="container pw-container">
   <div class="card">
     <h2>Change Password</h2>
 
     <c:if test="${not empty error}">
-      <div class="error-message">${error}</div>
+      <div class="msg-error">${error}</div>
     </c:if>
     <c:if test="${not empty success}">
-      <div class="success-message">${success}</div>
+      <div class="msg-success">${success}</div>
     </c:if>
 
     <form action="${pageContext.request.contextPath}/change-password" method="post">
@@ -95,15 +67,13 @@
       <div class="form-group">
         <label>New Password</label>
         <input type="password" name="newPassword" required>
-        <div class="password-rules">
-          Must be at least 8 characters with uppercase, lowercase, number, and special character (!@#$%^&*)
-        </div>
+        <div class="password-rules">Must be at least 8 characters with uppercase, lowercase, number, and special character (!@#$%^&*)</div>
       </div>
       <div class="form-group">
         <label>Confirm New Password</label>
         <input type="password" name="confirmPassword" required>
       </div>
-      <button type="submit" class="btn-primary">Change Password</button>
+      <button type="submit" class="btn btn-primary" style="width: 100%;">Change Password</button>
     </form>
 
     <c:choose>
