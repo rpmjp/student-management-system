@@ -6,6 +6,8 @@ import com.robertjp.dao.EnrollmentDAO;
 import com.robertjp.dao.StudentDAO;
 import com.robertjp.model.Student;
 
+import com.robertjp.dao.UserDAO;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -93,6 +95,19 @@ public class StudentServlet extends HttpServlet {
                 request.getRequestDispatcher("/students.jsp").forward(request, response);
                 break;
 
+            case "resetpw":
+                int resetId = Integer.parseInt(request.getParameter("id"));
+                Student resetStudent = studentDAO.getStudentById(resetId);
+                if (resetStudent != null && resetStudent.getUserId() != null) {
+                    UserDAO pwDAO = new UserDAO();
+                    pwDAO.updatePassword(resetStudent.getUserId(), "Student123!");
+                    request.setAttribute("message", "Password reset for " + resetStudent.getFirstName() + " " + resetStudent.getLastName() + " (default: Student123!)");
+                }
+                List<Student> allStudents = studentDAO.getAllStudents();
+                request.setAttribute("students", allStudents);
+                request.getRequestDispatcher("/students.jsp").forward(request, response);
+                break;
+
             default:
                 List<Student> students = studentDAO.getAllStudents();
                 request.setAttribute("students", students);
@@ -120,10 +135,24 @@ public class StudentServlet extends HttpServlet {
             student.setId(id);
             studentDAO.updateStudent(student);
         } else {
+            // Generate student ID and create user account
+            UserDAO userDAO = new UserDAO();
+            String studentId = userDAO.generateStudentId(firstName, lastName);
+            String defaultPassword = "Student123!";
+
+            // Create user account
+            int userId = userDAO.createUser(studentId, defaultPassword, "STUDENT");
+
+            // Create student with linked user account
             Student student = new Student(firstName, lastName, email, major, gpa, enrollmentDate);
+            student.setUserId(userId);
+            student.setStudentId(studentId);
             studentDAO.addStudent(student);
+
+            System.out.println("NEW STUDENT: " + firstName + " " + lastName +
+                    " | ID: " + studentId + " | Default password: " + defaultPassword);
         }
 
-        response.sendRedirect("students");
+        response.sendRedirect(request.getContextPath() + "/students");
     }
 }

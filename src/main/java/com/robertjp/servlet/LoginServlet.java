@@ -4,6 +4,7 @@ import com.robertjp.dao.UserDAO;
 import com.robertjp.dao.StudentDAO;
 import com.robertjp.model.User;
 import com.robertjp.model.Student;
+import com.robertjp.util.DBConnection;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,6 +14,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 
 @WebServlet("/login")
@@ -35,11 +39,10 @@ public class LoginServlet extends HttpServlet {
             if (session != null) {
                 session.invalidate();
             }
-            response.sendRedirect("login");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
-        // If already logged in, redirect to appropriate page
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("user") != null) {
             User user = (User) session.getAttribute("user");
@@ -75,30 +78,10 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // Create session
         HttpSession session = request.getSession();
         session.setAttribute("user", user);
-        // Set display name
-        if (user.isStudent()) {
-            // display name set below after finding student record
-        } else {
-            // Get staff name from database
-            try (java.sql.Connection conn = com.robertjp.util.DBConnection.getConnection();
-                 java.sql.PreparedStatement stmt = conn.prepareStatement("SELECT first_name, last_name FROM staff WHERE user_id = ?")) {
-                stmt.setInt(1, user.getId());
-                java.sql.ResultSet rs = stmt.executeQuery();
-                if (rs.next()) {
-                    session.setAttribute("displayName", rs.getString("first_name") + " " + rs.getString("last_name"));
-                } else {
-                    session.setAttribute("displayName", user.getUsername());
-                }
-            } catch (Exception e) {
-                session.setAttribute("displayName", user.getUsername());
-            }
-        }
-        session.setMaxInactiveInterval(30 * 60); // 30 minutes
+        session.setMaxInactiveInterval(30 * 60);
 
-        // If student, find their student record
         if (user.isStudent()) {
             StudentDAO studentDAO = new StudentDAO();
             List<Student> allStudents = studentDAO.getAllStudents();
@@ -109,9 +92,29 @@ public class LoginServlet extends HttpServlet {
                     break;
                 }
             }
+            if (session.getAttribute("displayName") == null) {
+                session.setAttribute("displayName", username);
+            }
             response.sendRedirect(request.getContextPath() + "/portal/home");
         } else {
+            String displayName = getStaffName(user.getId());
+            session.setAttribute("displayName", displayName != null ? displayName : username);
             response.sendRedirect(request.getContextPath() + "/dashboard");
         }
+    }
+
+    private String getStaffName(int userId) {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(
+                     "SELECT first_name, last_name FROM staff WHERE user_id = ?")) {
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("first_name") + " " + rs.getString("last_name");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

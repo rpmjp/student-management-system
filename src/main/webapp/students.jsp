@@ -111,6 +111,12 @@
         .nav-username { color: #e94560; font-weight: 600; font-size: 14px; }
         .btn-logout { color: #ccc; text-decoration: none; padding: 6px 14px; border: 1px solid #444; border-radius: 6px; font-size: 13px; transition: all 0.2s; }
         .btn-logout:hover { background: #e94560; color: white; border-color: #e94560; }
+
+        .btn-settings { color: #ccc; text-decoration: none; padding: 6px 14px; border-radius: 6px; font-size: 13px; transition: all 0.2s; }
+        .btn-settings:hover { background: #16213e; color: #e94560; }
+
+        .btn-reset { background: #FF9800; color: white; padding: 6px 14px; font-size: 13px; }
+        .btn-reset:hover { background: #F57C00; }
     </style>
 </head>
 <body>
@@ -123,8 +129,9 @@
         <a href="enrollments" class="${pageContext.request.servletPath == '/enrollments.jsp' ? 'active' : ''}">Enrollments</a>
     </div>
     <div class="nav-user">
-        <span class="nav-username">${sessionScope.user.username}</span>
-        <a href="login?action=logout" class="btn-logout">Logout</a>
+        <span class="nav-username">${sessionScope.displayName}</span>
+        <a href="${pageContext.request.contextPath}/change-password" class="btn-settings">Settings</a>
+        <a href="${pageContext.request.contextPath}/login?action=logout" class="btn-logout">Logout</a>
     </div>
 </nav>
 
@@ -152,6 +159,12 @@
             }
             document.getElementById('predictionResult').innerHTML = html;
         </script>
+    </c:if>
+
+    <c:if test="${not empty message}">
+        <div class="card" style="border-left: 5px solid #4CAF50; margin-bottom: 20px;">
+            <p style="color: #2E7D32; font-weight: 500;">${message}</p>
+        </div>
     </c:if>
 
     <!-- Add/Edit Form -->
@@ -213,6 +226,7 @@
             <thead>
             <tr>
                 <th>ID</th>
+                <th>Student ID</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Major</th>
@@ -225,6 +239,7 @@
             <c:forEach var="student" items="${students}">
                 <tr>
                     <td>${student.id}</td>
+                    <td>${student.studentId}</td>
                     <td>${student.firstName} ${student.lastName}</td>
                     <td>${student.email}</td>
                     <td>${student.major}</td>
@@ -235,6 +250,8 @@
                         <a href="students?action=edit&id=${student.id}" class="btn btn-edit">Edit</a>
                         <a href="students?action=delete&id=${student.id}" class="btn btn-delete"
                            onclick="return confirm('Delete this student?');">Delete</a>
+                        <a href="students?action=resetpw&id=${student.id}" class="btn btn-reset"
+                           onclick="return confirm('Reset password to default for ${student.firstName} ${student.lastName}?');">Reset PW</a>
                     </td>
                 </tr>
             </c:forEach>
@@ -251,7 +268,7 @@
             <div class="mobile-card">
                 <div class="mobile-card-header">
                     <span class="mobile-card-name">${student.firstName} ${student.lastName}</span>
-                    <span class="mobile-card-id">#${student.id}</span>
+                    <span class="mobile-card-id">${student.studentId}</span>
                 </div>
                 <div class="mobile-card-row">
                     <span class="mobile-card-label">Email</span>
@@ -274,6 +291,8 @@
                     <a href="students?action=edit&id=${student.id}" class="btn btn-edit">Edit</a>
                     <a href="students?action=delete&id=${student.id}" class="btn btn-delete"
                        onclick="return confirm('Delete this student?');">Delete</a>
+                    <a href="students?action=resetpw&id=${student.id}" class="btn btn-reset"
+                       onclick="return confirm('Reset password to default for ${student.firstName} ${student.lastName}?');">Reset PW</a>
                 </div>
             </div>
         </c:forEach>

@@ -80,6 +80,9 @@
     .nav-username { color: #e94560; font-weight: 600; font-size: 14px; }
     .btn-logout { color: #ccc; text-decoration: none; padding: 6px 14px; border: 1px solid #444; border-radius: 6px; font-size: 13px; transition: all 0.2s; }
     .btn-logout:hover { background: #e94560; color: white; border-color: #e94560; }
+
+    .btn-settings { color: #ccc; text-decoration: none; padding: 6px 14px; border-radius: 6px; font-size: 13px; transition: all 0.2s; }
+    .btn-settings:hover { background: #16213e; color: #e94560; }
   </style>
 </head>
 <body>
@@ -92,8 +95,9 @@
     <a href="enrollments" class="${pageContext.request.servletPath == '/enrollments.jsp' ? 'active' : ''}">Enrollments</a>
   </div>
   <div class="nav-user">
-    <span class="nav-username">${sessionScope.user.username}</span>
-    <a href="login?action=logout" class="btn-logout">Logout</a>
+    <span class="nav-username">${sessionScope.displayName}</span>
+    <a href="${pageContext.request.contextPath}/change-password" class="btn-settings">Settings</a>
+    <a href="${pageContext.request.contextPath}/login?action=logout" class="btn-logout">Logout</a>
   </div>
 </nav>
 

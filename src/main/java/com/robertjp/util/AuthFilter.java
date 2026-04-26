@@ -51,7 +51,7 @@ public class AuthFilter implements Filter {
         }
 
         // Student trying to access staff pages
-        if (user.isStudent() && !path.startsWith("/portal") && !path.equals("/login") && !path.endsWith(".jsp")) {
+        if (user.isStudent() && !path.startsWith("/portal") && !path.equals("/login") && !path.equals("/change-password") && !path.endsWith(".jsp")) {
             System.out.println("FILTER: REDIRECT student to portal (accessing staff page: " + path + ")");
             res.sendRedirect(contextPath + "/portal/home");
             return;

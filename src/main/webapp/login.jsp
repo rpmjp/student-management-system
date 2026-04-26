@@ -42,6 +42,9 @@
       .login-logo { font-size: 40px; }
       .login-title { font-size: 20px; }
     }
+
+    .btn-settings { color: #ccc; text-decoration: none; padding: 6px 14px; border-radius: 6px; font-size: 13px; transition: all 0.2s; }
+    .btn-settings:hover { background: #16213e; color: #e94560; }
   </style>
 </head>
 <body>
@@ -69,13 +72,9 @@
       <button type="submit" class="btn-login">Sign In</button>
     </form>
 
-    <div class="role-hint">
-      <span class="role-badge role-staff">Staff Portal</span>
-      <span class="role-badge role-student">Student Portal</span>
-    </div>
-
     <div class="login-footer">
-      Forgot your password? <a href="#">Contact Admin</a>
+      Forgot your password? Contact your administrator to reset it.
+      <br><span style="font-size: 11px; color: #bbb;">Default password after reset: Student123!</span>
     </div>
   </div>
 </div>

@@ -11,18 +11,24 @@ public class StudentDAO {
 
     // CREATE - Insert a new student
     public boolean addStudent(Student student) {
-        String sql = "INSERT INTO students (first_name, last_name, email, major, gpa, enrollment_date) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO students (user_id, student_id, first_name, last_name, email, major, gpa, enrollment_date) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, student.getFirstName());
-            stmt.setString(2, student.getLastName());
-            stmt.setString(3, student.getEmail());
-            stmt.setString(4, student.getMajor());
-            stmt.setBigDecimal(5, student.getGpa());
-            stmt.setDate(6, Date.valueOf(student.getEnrollmentDate()));
+            if (student.getUserId() != null) {
+                stmt.setInt(1, student.getUserId());
+            } else {
+                stmt.setNull(1, java.sql.Types.INTEGER);
+            }
+            stmt.setString(2, student.getStudentId());
+            stmt.setString(3, student.getFirstName());
+            stmt.setString(4, student.getLastName());
+            stmt.setString(5, student.getEmail());
+            stmt.setString(6, student.getMajor());
+            stmt.setBigDecimal(7, student.getGpa());
+            stmt.setDate(8, Date.valueOf(student.getEnrollmentDate()));
 
             int rowsInserted = stmt.executeUpdate();
             return rowsInserted > 0;
