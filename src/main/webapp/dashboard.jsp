@@ -48,6 +48,7 @@
       .nav-brand { font-size: 18px; width: 100%; margin-bottom: 8px; }
       .nav-links { width: 100%; }
       .nav-links a { padding: 6px 12px; font-size: 13px; }
+      .nav-user { width: 100%; justify-content: space-between; margin-top: 8px; }
       .container { padding: 12px; }
       h1 { font-size: 22px; }
       .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -58,16 +59,24 @@
       .chart-card { padding: 16px; }
       .chart-card h3 { font-size: 15px; }
     }
+    .nav-user { display: flex; align-items: center; gap: 12px; }
+    .nav-username { color: #e94560; font-weight: 600; font-size: 14px; }
+    .btn-logout { color: #ccc; text-decoration: none; padding: 6px 14px; border: 1px solid #444; border-radius: 6px; font-size: 13px; transition: all 0.2s; }
+    .btn-logout:hover { background: #e94560; color: white; border-color: #e94560; }
   </style>
 </head>
 <body>
 <nav>
   <a href="dashboard" class="nav-brand">SMS</a>
   <div class="nav-links">
-    <a href="dashboard" class="active">Dashboard</a>
-    <a href="students">Students</a>
-    <a href="courses">Courses</a>
-    <a href="enrollments">Enrollments</a>
+    <a href="dashboard" class="${pageContext.request.servletPath == '/dashboard.jsp' ? 'active' : ''}">Dashboard</a>
+    <a href="students" class="${pageContext.request.servletPath == '/students.jsp' ? 'active' : ''}">Students</a>
+    <a href="courses" class="${pageContext.request.servletPath == '/courses.jsp' ? 'active' : ''}">Courses</a>
+    <a href="enrollments" class="${pageContext.request.servletPath == '/enrollments.jsp' ? 'active' : ''}">Enrollments</a>
+  </div>
+  <div class="nav-user">
+    <span class="nav-username">${sessionScope.user.username}</span>
+    <a href="login?action=logout" class="btn-logout">Logout</a>
   </div>
 </nav>
 

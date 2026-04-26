@@ -45,6 +45,8 @@ public class StudentDAO {
             while (rs.next()) {
                 Student student = new Student();
                 student.setId(rs.getInt("id"));
+                student.setUserId(rs.getObject("user_id") != null ? rs.getInt("user_id") : null);
+                student.setStudentId(rs.getString("student_id"));
                 student.setFirstName(rs.getString("first_name"));
                 student.setLastName(rs.getString("last_name"));
                 student.setEmail(rs.getString("email"));
@@ -152,6 +154,8 @@ public class StudentDAO {
             while (rs.next()) {
                 Student student = new Student();
                 student.setId(rs.getInt("id"));
+                student.setUserId(rs.getObject("user_id") != null ? rs.getInt("user_id") : null);
+                student.setStudentId(rs.getString("student_id"));
                 student.setFirstName(rs.getString("first_name"));
                 student.setLastName(rs.getString("last_name"));
                 student.setEmail(rs.getString("email"));

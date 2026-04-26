@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 
 public class Student {
     private int id;
+    private Integer userId;
+    private String studentId;
     private String firstName;
     private String lastName;
     private String email;
@@ -53,6 +55,12 @@ public class Student {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public Integer getUserId() { return userId; }
+    public void setUserId(Integer userId) { this.userId = userId; }
+
+    public String getStudentId() { return studentId; }
+    public void setStudentId(String studentId) { this.studentId = studentId; }
 
     @Override
     public String toString() {
