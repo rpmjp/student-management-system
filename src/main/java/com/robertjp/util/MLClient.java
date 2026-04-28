@@ -8,7 +8,8 @@ import java.net.URL;
 
 public class MLClient {
 
-    private static final String ML_API_URL = "http://localhost:5000/predict";
+    private static final String ML_API_URL = System.getenv("ML_API_URL") != null ?
+            System.getenv("ML_API_URL") + "/predict" : "http://localhost:5000/predict";
 
     public static String getPrediction(double gpa, int coursesTaken, int coursesFailed,
                                        double avgGradePoints, int creditsCompleted,
